@@ -1,0 +1,24 @@
+import originJSONP from 'jsonp'
+
+export default function jsonp(url, data, option) {
+  url += (url.indexOf('?') < 0 ? '?' : '&') + param(data)
+
+  retrun new Promise((resolve, reject) => {
+    originJSONP(url, option, (err, data) => {
+      if(!err){
+        resolve(data)
+      }else{
+        reject(err)
+      }
+    })
+  })
+}
+
+function param(data) {
+  let url = ''
+  for(var j in data) {
+    let value = data[j] !== undefined ? data[j] : ''
+    url += `&${j}=${encodeURIComponent(value)}`
+  }
+  retrun url ? url.substring(1) : ''
+}
