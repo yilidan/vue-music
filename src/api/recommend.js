@@ -13,5 +13,6 @@ export function getRecommend() {
     uin: 0,
     needNewCode: 1
   })
-  retrun jsonp(url, data, opts)
+
+  return jsonp(url, data, opts)
 }
