@@ -35,4 +35,3 @@ export function getDiscList() {
 
   return jsonp(url, data, opts)
 }
-
