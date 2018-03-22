@@ -1,7 +1,7 @@
 <template>
   <div class="recommend">
     <div class="recommend-content">
-      <div class="slider-wapper">
+      <div class="slider-wapper" v-if="recommends.length">
         <slider>
           <div v-for="item in recommends" :key="item.id">
             <a :href="item.linkUrl">
@@ -20,7 +20,7 @@
   </div>
 </template>
 <script>
-import {getRecommend} from 'api/recommend.js'
+import {getRecommend, getDiscList} from 'api/recommend.js'
 import {ERR_OK} from 'api/config.js'
 import Slider from 'base/slider/slider'
 
@@ -35,6 +35,7 @@ export default {
   },
   created () {
     this._getRecommend()
+    this._getDiscList()
   },
   methods: {
     _getRecommend() {
@@ -44,9 +45,34 @@ export default {
           console.log(res.data.slider)
         }
       })
+    },
+    _getDiscList() {
+      getDiscList().then((res) => {
+        if (res.code === ERR_OK) {
+          console.log(1)
+          console.log(res.data.list);
+
+        }
+      })
     }
   }
 }
 </script>
 <style lang="stylus" scoped>
+  @import '~common/stylus/variable'
+
+  .recommend
+      position: fixed
+      width: 100%
+      top: 88px
+      bottom: 0
+      .recommend-content
+        height: 100%
+        overflow: hidden
+        .list-title
+          height: 65px
+          line-height: 65px
+          text-align: center
+          font-size: $font-size-medium
+          color: $color-theme
 </style>
