@@ -10,6 +10,32 @@ const HtmlWebpackPlugin = require('html-webpack-plugin')
 const FriendlyErrorsPlugin = require('friendly-errors-webpack-plugin')
 const portfinder = require('portfinder')
 
+// const express = require('express')
+
+// var app = express()
+// // axios 结合 node.js 代理后端请求
+// var apiRoutes = express.Router()
+
+// apiRoutes.get('/getDiscList', function (req, res) {
+//   // var url = 'https://c.y.qq.com/splcloud/fcgi-bin/fcg_get_diss_by_tag.fcg'
+//   var url = 'http://ustbhuangyi.com/music/api/getDiscList'
+
+//   axios.get(url, {
+//       headers: {
+//         referer: 'http://ustbhuangyi.com/music/',
+//         host: 'ustbhuangyi.com'
+//       },
+//       params: req.query
+//     })
+//     .then(function (response) {
+//       res.json(response.data)
+//     })
+//     .catch(function (error) {
+//       console.log(error)
+//     })
+// })
+// app.use('/api', apiRoutes)
+
 const HOST = process.env.HOST
 const PORT = process.env.PORT && Number(process.env.PORT)
 

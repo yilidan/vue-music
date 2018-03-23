@@ -13,16 +13,21 @@
       <div class="recommend-list">
         <h1 class="list-title">热门歌单推荐</h1>
         <ul>
-          <li></li>
+          <li v-for="(item,index) in discList" class="item">
+            <div class="">
+              <img width="60" height="60" :src="item.imgurl" alt="">
+            </div>
+          </li>
         </ul>
       </div>
     </div>
   </div>
 </template>
 <script>
-import {getRecommend, getDiscList} from 'api/recommend.js'
+import {getRecommend} from 'api/recommend.js'
 import {ERR_OK} from 'api/config.js'
 import Slider from 'base/slider/slider'
+import axios from 'axios'
 
 export default {
   components: {
@@ -30,7 +35,8 @@ export default {
   },
   data () {
     return {
-      recommends: []
+      recommends: [],
+      discList: []
     }
   },
   created () {
@@ -47,12 +53,16 @@ export default {
       })
     },
     _getDiscList() {
-      getDiscList().then((res) => {
-        if (res.code === ERR_OK) {
-          console.log(1)
-          console.log(res.data.list);
-
-        }
+      // getDiscList().then((res) => {
+      //   if (res.code === ERR_OK) {
+      //     console.log(res)
+      //   }
+      // })
+      let url = 'static/test1.json'
+      axios.get(url).then((res) => {
+        let data = res.data
+        this.discList = data.data.list
+        console.log(this.discList)
       })
     }
   }
