@@ -6,6 +6,7 @@
           <slider>
             <div v-for="item in recommends" :key="item.id">
               <a :href="item.linkUrl">
+                <!-- "needsclick"为fastclick插件的属性（默认通过点击触发） -->
                 <img class="needsclick" @load="loadImage" :src="item.picUrl" alt="">
               </a>
             </div>
