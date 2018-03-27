@@ -24,8 +24,8 @@ export function getRecommend() {
  */
 export function getDiscList() {
   // let url = 'https://c.y.qq.com/splcloud/fcgi-bin/fcg_get_diss_by_tag.fcg'
-  // let url = 'http://ustbhuangyi.com/music/api/getDiscList'
-  let url = '/src/api/test1.json'
+  let url = 'http://ustbhuangyi.com/music/api/getDiscList'
+  // let url = '/src/api/test1.json'
   let data = Object.assign({}, commonParams, {
     platform: 'yqq',
     hostUin: 0,
