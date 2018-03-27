@@ -24,7 +24,7 @@ export default {
   props: {
     data: {
       type: Array,
-      defalut: []
+      defalut: null
     }
   }
 }
