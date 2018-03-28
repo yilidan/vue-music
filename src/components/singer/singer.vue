@@ -1,5 +1,5 @@
 <template>
-  <div class="singer">
+  <div class="singer" ref="singer">
     <list-view :data="singers">
     </list-view>
   </div>
@@ -84,8 +84,8 @@ export default {
 <style lang="stylus" scoped>
 
   .singer
-    width 100%
     position fixed
     top 88px
-    left 0
+    bottom 0
+    width 100%
 </style>

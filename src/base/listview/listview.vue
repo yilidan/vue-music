@@ -1,5 +1,9 @@
 <template>
-  <scroll class="listview" :data="data">
+  <scroll class="listview"
+          :data="data"
+          ref="listview"
+          :listenScroll="listenScroll"
+          @scroll="scroll">
     <ul>
       <li v-for="group in data" class="list-group" ref="listGroup">
         <h2 class="list-group-title">{{group.title}}</h2>
@@ -11,22 +15,76 @@
         </uL>
       </li>
     </ul>
+    <div class="list-shortcut" @touchstart="onShortcutTouchStart" @touchmove.stop.prevent="onShortcutTouchMove">
+      <ul>
+        <li v-for="(item,index) in shortcutList" class="item" :data-index="index">{{item}}</li>
+      </ul>
+    </div>
   </scroll>
 </template>
 
 <script>
 import Scroll from 'base/scroll/scroll'
+import {getData} from 'common/js/dom'
+
+// 右侧导航栏元素的高度
+const ANCHOR_HEIGHT = 18
 
 export default {
   components: {
     Scroll
+  },
+  created () {
+    this.touch = {}
+    this.listenScroll = true
+  },
+  data () {
+    return {
+      scrollY: -1,
+      currentIndex: 0
+    }
   },
   props: {
     data: {
       type: Array,
       defalut: null
     }
-  }
+  },
+  computed: {
+    shortcutList() {
+      return this.data.map((group) => {
+        return group.title.substr(0, 1)
+      })
+    }
+  },
+  methods: {
+    // 右侧导航栏
+    onShortcutTouchStart(e) {
+      let anchorIndex = getData(e.target, 'index')
+      // console.dir(e)
+      let firstTouch = e.touches[0]
+      this.touch.y1 = firstTouch.pageY
+      this.touch.anchorIndex = anchorIndex
+      this._scrollTo(anchorIndex)
+    },
+    onShortcutTouchMove(e) {
+      let firstTouch = e.touches[0]
+      this.touch.y2 = firstTouch.pageY
+      let detal = (this.touch.y2 - this.touch.y1) / ANCHOR_HEIGHT | 0
+      let anchorIndex = parseInt(this.touch.anchorIndex) + detal
+      // console.log(anchorIndex);
+      this._scrollTo(anchorIndex)
+    },
+    // 监听滚动Y轴，实现右侧当前元素高亮
+    scroll(pos) {
+      this.scrollY = pos.y
+    },
+    _scrollTo(index) {
+      this.$refs.listview.scrollToElement(this.$refs.listGroup[index], 0)
+    }
+
+  },
+
 }
 </script>
 
