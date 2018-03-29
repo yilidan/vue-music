@@ -5,9 +5,9 @@
   </div>
 </template>
 <script>
-import {getSingerList} from 'api/singer'
-import {ERR_OK} from 'api/config'
-import Singer from 'common/js/singer'     //定义类 new Singer()
+import { getSingerList } from 'api/singer'
+import { ERR_OK } from 'api/config'
+import Singer from 'common/js/singer' //定义类 new Singer()
 import ListView from 'base/listview/listview'
 
 const HOT_NAME = '热门'
@@ -17,18 +17,18 @@ export default {
   components: {
     ListView
   },
-  data () {
+  data() {
     return {
       singers: []
     }
   },
-  created () {
+  created() {
     this._getSingerList()
   },
   methods: {
     _getSingerList() {
-      getSingerList().then((res) => {
-        if(res.code === ERR_OK) {
+      getSingerList().then(res => {
+        if (res.code === ERR_OK) {
           this.singers = this._normalizeSinger(res.data.list)
           console.log(this.singers)
         }
@@ -43,10 +43,12 @@ export default {
       }
       list.forEach((item, index) => {
         if (index < HOT_SINGER_LEN) {
-          map.hot.items.push(new Singer({
-            id: item.Fsinger_mid,
-            name: item.Fsinger_name
-          }))
+          map.hot.items.push(
+            new Singer({
+              id: item.Fsinger_mid,
+              name: item.Fsinger_name
+            })
+          )
         }
         const key = item.Findex
         if (!map[key]) {
@@ -55,10 +57,12 @@ export default {
             items: []
           }
         }
-        map[key].items.push(new Singer({
-          id: item.Fsinger_mid,
-          name: item.Fsinger_name
-        }))
+        map[key].items.push(
+          new Singer({
+            id: item.Fsinger_mid,
+            name: item.Fsinger_name
+          })
+        )
       })
 
       // 为了得到有序列表，处理 map数据
@@ -68,7 +72,7 @@ export default {
         let val = map[key]
         if (val.title.match(/[a-zA-Z]/)) {
           ret.push(val)
-        }else if (val.title === HOT_NAME){
+        } else if (val.title === HOT_NAME) {
           hot.push(val)
         }
       }
@@ -77,7 +81,6 @@ export default {
       })
       return hot.concat(ret)
     }
-
   }
 }
 </script>
