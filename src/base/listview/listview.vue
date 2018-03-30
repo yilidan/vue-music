@@ -9,7 +9,7 @@
       <li v-for="group in data" class="list-group" ref="listGroup">
         <h2 class="list-group-title">{{group.title}}</h2>
         <uL>
-          <li v-for="item in group.items" class="list-group-item">
+          <li v-for="item in group.items" class="list-group-item" @click="selectItem(item)">
             <img class="avatar" v-lazy="item.avatar">
             <span class="name">{{item.name}}</span>
           </li>
@@ -21,22 +21,28 @@
         <li v-for="(item,index) in shortcutList" class="item" :class="{'current': currentIndex===index}" :data-index="index">{{item}}</li>
       </ul>
     </div>
-    <div class="list-fixed" v-show="fixedTitle">
+    <div class="list-fixed" v-show="fixedTitle" ref="fixed">
       <h1 class="fixed-title">{{fixedTitle}}</h1>
+    </div>
+    <div class="loading-container" v-show="!data.length">
+      <loading></loading>
     </div>
   </scroll>
 </template>
 
 <script>
 import Scroll from 'base/scroll/scroll'
+import Loading from 'base/loading/loading'
 import { getData } from 'common/js/dom'
 
 // 右侧导航栏元素的高度
 const ANCHOR_HEIGHT = 18
+const TITLE_HEIGHT = 30
 
 export default {
   components: {
-    Scroll
+    Scroll,
+    Loading
   },
   created() {
     this.touch = {}
@@ -46,9 +52,9 @@ export default {
   },
   data() {
     return {
-      scrollY: -1,    // y轴滚动距离
-      currentIndex: 0,  // 右侧导航栏当前点击元素
-      diff: -1      // fixed标题
+      scrollY: -1, // y轴滚动距离
+      currentIndex: 0, // 右侧导航栏当前点击元素
+      diff: -1 // fixed标题
     }
   },
   props: {
@@ -78,12 +84,22 @@ export default {
         let height2 = listHeight[i + 1]
         if (-newY >= height1 && -newY < height2) {
           this.currentIndex = i
+          this.diff = height2 + newY
           // console.log(this.currentIndex)
           return
         }
       }
       // 当滚动到底部，并且-newY大于最好一个元素的上限
       this.currentIndex = listHeight.length - 2
+    },
+    diff(newVal) {
+      let fixedTop =
+        newVal > 0 && newVal < TITLE_HEIGHT ? newVal - TITLE_HEIGHT : 0
+      if (this.fixedTop === fixedTop) {
+        return
+      }
+      this.fixedTop = fixedTop
+      this.$refs.fixed.style.transform = `translate3d(0, ${fixedTop}px, 0)`
     }
   },
   computed: {
@@ -102,6 +118,10 @@ export default {
     }
   },
   methods: {
+    // 派发跳转歌手详情页事件
+    selectItem(item) {
+      this.$emit('select', item)
+    },
     // 右侧导航栏
     onShortcutTouchStart(e) {
       let anchorIndex = getData(e.target, 'index')
