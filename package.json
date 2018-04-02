@@ -15,12 +15,12 @@
     "babel-polyfill": "^6.26.0",
     "babel-runtime": "^6.26.0",
     "better-scroll": "^0.1.15",
-    "express": "^4.16.3",
     "fastclick": "^1.0.6",
     "jsonp": "^0.2.1",
     "vue": "^2.5.2",
     "vue-router": "^3.0.1",
-    "vue-lazyload": "^1.2.2"
+    "vue-lazyload": "^1.2.2",
+    "vuex": "^3.0.1"
   },
   "devDependencies": {
     "autoprefixer": "^7.1.2",

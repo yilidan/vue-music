@@ -10,11 +10,11 @@ const HtmlWebpackPlugin = require('html-webpack-plugin')
 const FriendlyErrorsPlugin = require('friendly-errors-webpack-plugin')
 const portfinder = require('portfinder')
 
-// const express = require('express')
-
-// var app = express()
-// // axios 结合 node.js 代理后端请求
-// var apiRoutes = express.Router()
+const express = require('express')
+const axios = require('axios')
+// const app = express()
+// axios 结合 node.js 代理后端请求
+const apiRoutes = express.Router()
 
 // apiRoutes.get('/getDiscList', function (req, res) {
 //   // var url = 'https://c.y.qq.com/splcloud/fcgi-bin/fcg_get_diss_by_tag.fcg'
@@ -68,6 +68,29 @@ const devWebpackConfig = merge(baseWebpackConfig, {
     quiet: true, // necessary for FriendlyErrorsPlugin
     watchOptions: {
       poll: config.dev.poll,
+    },
+    before(apiRoutes) {
+      // 请求qq音乐接口
+      apiRoutes.get('/api/getDiscList', function (req, res) {
+        var url = 'https://c.y.qq.com/splcloud/fcgi-bin/fcg_get_diss_by_tag.fcg'
+        // var url = 'http://ustbhuangyi.com/music/api/getDiscList'
+        axios.get(url, {
+            headers: {
+              // referer: 'http://ustbhuangyi.com/music/',
+              // host: 'ustbhuangyi.com'
+              referer: 'https://c.y.qq.com/',
+              host: 'c.y.qq.com'
+            },
+            params: req.query
+          })
+          .then(function (response) {
+            res.json(response.data)
+          })
+          .catch(function (error) {
+            console.log(error)
+          })
+      })
+      // app.use('/api', apiRoutes)
     }
   },
   plugins: [

@@ -7,8 +7,43 @@
 </template>
 
 <script>
-export default {
+// vuex提供的语法糖（取数据）
+import { mapGetters } from 'vuex'
+import { getSingerDetail } from 'api/singer'
+import { ERR_OK } from 'api/config'
 
+export default {
+  data () {
+    return {
+      songs: []
+    }
+  },
+  computed: {
+    //  取数据
+    ...mapGetters(['singer'])
+  },
+  created() {
+    this._getDetail()
+    console.log(this.singer)
+  },
+  methods: {
+    _getDetail() {
+      //  当如果没有singer.id时，跳转到歌手页
+      if (!this.singer.id) {
+        this.$router.push('/singer')
+        return
+      }
+      getSingerDetail(this.singer.id).then((res) => {
+        if (res.code === ERR_OK) {
+          console.log(res.data.list)
+        }
+      })
+    },
+    _normalizeSongs(list) {
+
+    }
+
+  }
 }
 </script>
 

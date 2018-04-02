@@ -21,12 +21,12 @@ export function getRecommend() {
  * jsonp 抓取热门歌单数据
  * 接口：https://c.y.qq.com/splcloud/fcgi-bin/fcg_get_diss_by_tag.fcg
  * https://y.qq.com/portal/playlist.html
+ * http://ustbhuangyi.com/music/api/getDiscList
  */
 export function getDiscList() {
-  // let url = 'https://c.y.qq.com/splcloud/fcgi-bin/fcg_get_diss_by_tag.fcg'
-  let url = 'http://ustbhuangyi.com/music/api/getDiscList'
-  // let url = '/src/api/test1.json'
+  let url = '/api/getDiscList'
   let data = Object.assign({}, commonParams, {
+    g_tk: 1928093487,
     platform: 'yqq',
     hostUin: 0,
     sin: 0,

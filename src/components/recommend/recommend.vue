@@ -39,8 +39,9 @@ import Scroll from 'base/scroll/scroll'
 import Slider from 'base/slider/slider'
 import Loading from 'base/loading/loading'
 import {getRecommend} from 'api/recommend.js'
+import {getDiscList} from 'api/recommend.js'
 import {ERR_OK} from 'api/config.js'
-import axios from 'axios'
+// import axios from 'axios'
 
 export default {
   components: {
@@ -56,10 +57,10 @@ export default {
   },
   created () {
     this._getRecommend()
-    setTimeout(()=>{
-      this._getDiscList()
-    },200)
-
+    this._getDiscList()
+    // setTimeout(()=>{
+    //   this._getDiscList()
+    // },200)
   },
   methods: {
     _getRecommend() {
@@ -71,21 +72,22 @@ export default {
       })
     },
     _getDiscList() {
-      // getDiscList().then((res) => {
-      //   if (res.code === ERR_OK) {
-      //     console.log(res)
-      //   }
-      // })
-      let url = 'static/test1.json'
-      axios.get(url)
-        .then((res) => {
-          let data = res.data
-          this.discList = data.data.list
-          console.log(this.discList)
-        })
-        .catch((err) => {
-          console.log(err)
-        })
+      getDiscList().then((res) => {
+        if (res.code === ERR_OK) {
+          this.discList = res.data.list
+          console.log(res.data.list)
+        }
+      })
+      // let url = 'static/test1.json'
+      // axios.get(url)
+      //   .then((res) => {
+      //     let data = res.data
+      //     this.discList = data.data.list
+      //     console.log(this.discList)
+      //   })
+      //   .catch((err) => {
+      //     console.log(err)
+      //   })
     },
     loadImage() {
       if (!this.checkLoaded){
