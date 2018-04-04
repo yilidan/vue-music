@@ -46,7 +46,7 @@ export default {
       // 是否监听滚动，触发父组件scroll事件
       if (this.listenScroll) {
         let me = this
-        this.scroll.on('scroll', pos => {
+        this.scroll.on('scroll', (pos) => {
           me.$emit('scroll', pos)
         })
       }
