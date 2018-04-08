@@ -52,7 +52,7 @@ export default {
     },
     _normalizeSongs(list) {
       let ret = []
-      list.forEach((item)=>{
+      list.forEach((item) => {
         let {musicData} = item
         if (musicData.songid && musicData.albummid) {
           ret.push(createSong(musicData))

@@ -39,13 +39,13 @@ export default {
       this._setSliderWidth()
       this._initDots()
       this._initSlider()
-      if(this.autoPlay){
+      if (this.autoPlay) {
         this._play()
       }
     }, 20)
     // 监听屏幕大小变化
     window.addEventListener('resize', () => {
-      if(!this.slider){
+      if (!this.slider) {
         return
       }
       this._setSliderWidth(true)
@@ -82,14 +82,14 @@ export default {
         snapLoop: this.loop,
         snapThreshold: 0.3,
         snapSpeed: 400
-      }),
+      })
       this.slider.on('scrollEnd', () => {
         let pageIndex = this.slider.getCurrentPage().pageX
         if (this.loop) {
           pageIndex -= 1
         }
         this.currentPageIndex = pageIndex
-         if(this.autoPlay){
+         if (this.autoPlay) {
           clearTimeout(this.tiemer)
           this._play()
         }
@@ -98,10 +98,10 @@ export default {
     // 实现自动轮播
     _play() {
       let pageIndex = this.currentPageIndex + 1
-      if(this.loop){
+      if (this.loop) {
         pageIndex += 1
       }
-      this.tiemer = setTimeout(()=>{
+      this.tiemer = setTimeout(() => {
         this.slider.goToPage(pageIndex, 0, 400)
       }, this.interval)
     }

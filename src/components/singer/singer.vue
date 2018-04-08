@@ -7,7 +7,7 @@
 <script>
 import { getSingerList } from 'api/singer'
 import { ERR_OK } from 'api/config'
-import Singer from 'common/js/singer' //定义类 new Singer()
+import Singer from 'common/js/singer' // 定义类 new Singer()
 import ListView from 'base/listview/listview'
 // vuex提供的语法糖（存储数据）
 import {mapMutations} from 'vuex'

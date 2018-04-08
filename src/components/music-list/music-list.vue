@@ -22,7 +22,7 @@
       class="list"
       ref="list">
       <div class="song-list-wrapper">
-        <song-list :songs="songs"></song-list>
+        <song-list @select="selectItem" :songs="songs"></song-list>
       </div>
       <!-- loading组件 -->
       <div class="loading-container" v-show="!songs.length">
@@ -128,6 +128,9 @@ export default {
     },
     back() {
       this.$router.back()
+    },
+    // 点击相应歌曲，显示player组件
+    selectItem(item, index) {
     }
   }
 }
