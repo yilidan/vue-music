@@ -9,7 +9,7 @@ import { getSingerList } from 'api/singer'
 import { ERR_OK } from 'api/config'
 import Singer from 'common/js/singer' // 定义类 new Singer()
 import ListView from 'base/listview/listview'
-// vuex提供的语法糖（存储数据）
+// vuex提供的语法糖
 import {mapMutations} from 'vuex'
 
 const HOT_NAME = '热门'
@@ -33,7 +33,7 @@ export default {
       this.$router.push({
         path: `/singer/${singer.id}`
       })
-      //  存入singer数据到mutations
+      // 通过映射的setSinger方法，将singer数据传入
       this.setSinger(singer)
     },
     _getSingerList() {
@@ -91,7 +91,7 @@ export default {
       })
       return hot.concat(ret)
     },
-    //  存入singer数据到mutations
+    //  将mutations中的SET_SINGER对象映射到setSinger方法中
     ...mapMutations({
       setSinger: 'SET_SINGER'
     })

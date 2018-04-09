@@ -49,13 +49,16 @@ export default {
         return
       }
       this._setSliderWidth(true)
+      // BScroll刷新
       this.slider.refresh()
     })
   },
   methods: {
     _setSliderWidth(isResize) {
+      // 获取sliderGroup的子元素
       this.children = this.$refs.sliderGroup.children
       let width = 0
+      // 获取屏幕的width
       let sliderWidth = this.$refs.slider.clientWidth
       for (let i = 0; i < this.children.length; i++) {
         let child = this.children[i]
@@ -63,6 +66,7 @@ export default {
         child.style.width = sliderWidth + 'px'
         width += sliderWidth
       }
+      // 是否loop循环轮播
       if (this.loop && !isResize) {
         width += 2 * sliderWidth
       }

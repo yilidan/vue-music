@@ -28,7 +28,7 @@ export default {
     bgImage() {
       return this.singer.avatar
     },
-    //  取数据
+    // 从getters中取出singer数据
     ...mapGetters([
       'singer'
     ])

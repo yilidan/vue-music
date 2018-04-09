@@ -37,6 +37,8 @@ import Scroll from 'base/scroll/scroll'
 import SongList from 'base/song-list/song-list'
 import {prefixStyle} from 'common/js/dom'
 import Loading from 'base/loading/loading'
+// vuex提供的语法糖
+import {mapActions} from 'vuex'
 
 const RESERVED_HEIGHT = 40
 const transform = prefixStyle('transform')
@@ -131,7 +133,15 @@ export default {
     },
     // 点击相应歌曲，显示player组件
     selectItem(item, index) {
-    }
+      this.selectPlay({
+        list: this.songs,
+        index
+      })
+    },
+    // 利用actions来修改mutations中的值
+    ...mapActions([
+      'selectPlay'
+    ])
   }
 }
 </script>
