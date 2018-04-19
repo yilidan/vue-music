@@ -5,6 +5,7 @@ import router from './router'
 // Vuex仓库
 import store from './store'
 import fastclick from 'fastclick'
+// 图片懒加载
 import VueLazyload from 'vue-lazyload'
 
 import 'common/stylus/index.styl'
