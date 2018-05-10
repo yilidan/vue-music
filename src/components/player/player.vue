@@ -19,7 +19,7 @@
         <div class="middle">
           <div class="middle-l">
             <div class="cd-wrapper" ref="cdWrapper">
-              <div class="cd">
+              <div class="cd" :class="cdCls">
                 <img class="image" :src="currentSong.image">
               </div>
             </div>
@@ -50,13 +50,14 @@
     <transition name="mini">
       <div class="mini-player" v-show="!fullScreen" @click="open">
         <div class="icon">
-          <img :src="currentSong.image" width="40" height="40">
+          <img :class="cdCls" :src="currentSong.image" width="40" height="40">
         </div>
         <div class="text">
           <h2 class="name" v-html="currentSong.name"></h2>
           <p class="desc" v-html="currentSong.singer"></p>
         </div>
         <div class="control">
+          <i @click.stop="togglePlaying" :class="miniIcon"></i>
         </div>
         <div class="control">
           <i class="icon-playlist"></i>
@@ -99,8 +100,14 @@ export default {
     }
   },
   computed: {
+    cdCls() {
+      return this.playing ? 'play' : 'play pause'
+    },
     playIcon() {
       return this.playing ? 'icon-play' : 'icon-pause'
+    },
+    miniIcon() {
+      return this.playing ? 'icon-play-mini' : 'icon-pause-mini'
     },
     ...mapGetters([
       'fullScreen',
@@ -242,6 +249,7 @@ export default {
         .middle-l
           display inline-block
           vertical-align top
+          position relative
           width 100%
           height 0
           padding-top 80%
@@ -250,21 +258,27 @@ export default {
             left 10%
             top 0
             width 80%
-            box-sizing border-box
+            // box-sizing border-box
             height 100%
             .cd
               width 100%
               height 100%
-              border-radius: 50%
+              box-sizing border-box
+              border 10px solid rgba(255, 255, 255, 0.1)
+              border-radius 50%
+              &.play
+                animation rotate 20s linear infinite
+              &.pause
+                animation-play-state paused     
               .image
                 position absolute
                 top 0
                 left 0
                 width 100%
-                // height 100%
-                box-sizing border-box
+                height 100%
+                // box-sizing border-box
                 border-radius 50%
-                border 10px solid rgba(255, 255, 255, 0.1)
+                // border 10px solid hsla(0,0%,100%,.1)
       .bottom
         position absolute
         bottom 50px
@@ -318,6 +332,10 @@ export default {
         padding 0 10px 0 20px
         img
           border-radius 50%
+          &.play
+            animation rotate 20s linear infinite
+          &.pause
+            animation-play-state paused 
       .text
         display flex
         flex-direction column
@@ -338,8 +356,18 @@ export default {
         flex 0 0 30px
         width 30px
         padding 0 10px
-        .icon-playlist
-          font-size 30px
-          color $color-theme-d
+        .icon-play-mini, .icon-pause-mini, .icon-playlist
+          font-size: 30px
+          color: $color-theme-d
+        .icon-mini
+          font-size: 32px
+          position: absolute
+          left: 0
+          top: 0
 
+  @keyframes rotate
+    0%
+      transform rotate(0)
+    100%
+      transform rotate(360deg)
 </style>
