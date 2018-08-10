@@ -26,19 +26,27 @@
           </div>
         </div>
         <div class="bottom">
+          <!-- 歌曲播放时间进度 -->
+          <div class="progress-wrapper">
+            <span class="time time-l">{{format(currentTime)}}</span>
+            <div class="progress-bar-wrapper">
+              <progress-bar :percent="percent" @percentChange="onProgressBarChange"></progress-bar>
+            </div>
+            <span class="time time-r">{{format(currentSong.duration)}}</span>
+          </div>
           <div class="operators">
             <div class="icon i-left">
               <i class="icon-sequence"></i>
             </div>
-            <div class="icon i-left">
-              <i class="icon-prev"></i>
+            <div class="icon i-left" :class="disableCls">
+              <i @click="prev" class="icon-prev"></i>
             </div>
             <!-- 播放/暂停 -->
-            <div class="icon i-center">
+            <div class="icon i-center" :class="disableCls">
               <i class="needsclick" @click="togglePlaying" :class="playIcon"></i>
             </div>
-            <div class="icon i-right">
-              <i class="icon-next"></i>
+            <div class="icon i-right" :class="disableCls">
+              <i @click="next" class="icon-next"></i>
             </div>
             <div class="icon i-right">
               <i class="icon-not-favorite"></i>
@@ -64,30 +72,34 @@
         </div>
       </div>
     </transition>
-    <audio ref="audio" :src="currentSong.url"></audio>
+    <audio ref="audio" :src="currentSong.url" @canplay="ready" @error="error" @timeupdate="updateTime"></audio>
   </div>
 </template>
 
 <script>
 // vuex提供的语法糖
-import {mapGetters, mapMutations} from 'vuex'
+import { mapGetters, mapMutations } from 'vuex'
 import animations from 'create-keyframe-animation'
 // 给CSS3属性添加前缀
-import {prefixStyle} from 'common/js/dom'
+import { prefixStyle } from 'common/js/dom'
+import ProgressBar from 'base/progress-bar/progress-bar.vue'
 
 const transform = prefixStyle('transform')
 
 export default {
-  props: {
-
+  components: {
+    ProgressBar
   },
-  data () {
+  props: {},
+  data() {
     return {
-
+      songReady: false,
+      currentTime: 0
     }
   },
   watch: {
     currentSong() {
+      console.log(this.currentSong)
       this.$nextTick(() => {
         this.$refs.audio.play()
       })
@@ -104,16 +116,23 @@ export default {
       return this.playing ? 'play' : 'play pause'
     },
     playIcon() {
-      return this.playing ? 'icon-play' : 'icon-pause'
+      return this.playing ? 'icon-pause' : 'icon-play'
     },
     miniIcon() {
-      return this.playing ? 'icon-play-mini' : 'icon-pause-mini'
+      return this.playing ? 'icon-pause-mini' : 'icon-play-mini'
+    },
+    disableCls() {
+      return this.songReady ? '' : 'disable'
+    },
+    percent() {
+      return this.currentTime / this.currentSong.duration
     },
     ...mapGetters([
       'fullScreen',
       'playlist',
       'currentSong',
-      'playing'
+      'playing',
+      'currentIndex'
     ])
   },
   methods: {
@@ -125,11 +144,75 @@ export default {
     },
     // 播放/暂停功能
     togglePlaying() {
+      if (!this.songReady) {
+        return
+      }
       console.log(this.playing)
       this.setPlayingState(!this.playing)
     },
+    next() {
+      if (!this.songReady) {
+        return
+      }
+      let index = this.currentIndex + 1
+      if (index === this.playlist.length) {
+        index = 0
+      }
+      this.setCurrentIndex(index)
+      if (!this.playing) {
+        this.togglePlaying()
+      }
+      this.songReady = false
+    },
+    prev() {
+      if (!this.songReady) {
+        return
+      }
+      let index = this.currentIndex - 1
+      if (index === -1) {
+        index = this.playlist.length - 1
+      }
+      this.setCurrentIndex(index)
+      if (!this.playing) {
+        this.togglePlaying()
+      }
+      this.songReady = false
+    },
+    ready() {
+      this.songReady = true
+    },
+    error() {
+      this.songReady = true
+    },
+    updateTime(e) {
+      this.currentTime = e.target.currentTime
+    },
+    format(interval) {
+      // number | 0 --> 向下取整
+      interval = interval | 0
+      const minute = (interval / 60) | 0
+      const second = this._pad(interval % 60)
+      return `${minute}:${second}`
+    },
+    // 进度条小圆点移动
+    onProgressBarChange(percent) {
+      const currentTime = this.currentSong.duration * percent
+      this.$refs.audio.currentTime = currentTime
+      console.log(currentTime)
+      if (!this.playing) {
+        this.togglePlaying()
+      }
+    },
+    _pad(num, n=2) {
+      let len = num.toString().length
+      while(len<n) {
+        num = '0' + num
+        len++
+      }
+      return num
+    },
     enter(el, done) {
-      const {x, y, scale} = this._getPosAndScale()
+      const { x, y, scale } = this._getPosAndScale()
       let animation = {
         0: {
           transform: `translate3d(${x}px, ${y}px, 0) scale(${scale})`
@@ -157,8 +240,10 @@ export default {
     },
     leave(el, done) {
       this.$refs.cdWrapper.style.transition = 'all 0.4s'
-      const {x, y, scale} = this._getPosAndScale()
-      this.$refs.cdWrapper.style[transform] = `translate3d(${x}px, ${y}px, 0) scale(${scale})`
+      const { x, y, scale } = this._getPosAndScale()
+      this.$refs.cdWrapper.style[
+        transform
+      ] = `translate3d(${x}px, ${y}px, 0) scale(${scale})`
       this.$refs.cdWrapper.addEventListener('transitionend', done)
     },
     afterLeave() {
@@ -184,10 +269,10 @@ export default {
     // 通过mapMutations来改变fullScreen的值
     ...mapMutations({
       setFullScreen: 'SET_FULL_SCRREN',
-      setPlayingState: 'SET_PLAYING_STATE'
+      setPlayingState: 'SET_PLAYING_STATE',
+      setCurrentIndex: 'SET_CURRENT_INDEX'
     })
   }
-
 }
 </script>
 
@@ -269,7 +354,7 @@ export default {
               &.play
                 animation rotate 20s linear infinite
               &.pause
-                animation-play-state paused     
+                animation-play-state paused
               .image
                 position absolute
                 top 0
@@ -283,6 +368,24 @@ export default {
         position absolute
         bottom 50px
         width 100%
+        .progress-wrapper
+          display: flex
+          align-items: center
+          width: 80%
+          margin: 0px auto
+          padding: 10px 0
+          .time
+            color: $color-text
+            font-size: $font-size-small
+            flex: 0 0 30px
+            line-height: 30px
+            width: 30px
+            &.time-l
+              text-align: left
+            &.time-r
+              text-align: right
+          .progress-bar-wrapper
+            flex: 1
         .operators
           display flex
           align-items center
@@ -335,7 +438,7 @@ export default {
           &.play
             animation rotate 20s linear infinite
           &.pause
-            animation-play-state paused 
+            animation-play-state paused
       .text
         display flex
         flex-direction column
