@@ -65,8 +65,11 @@ export default {
     },
     // 点击播放条停留的位置
     progressClick(e) {
-      console.log(e)
-      this._offset(e.offsetX)
+      const rect = this.$refs.progressBar.getBoundingClientRect()
+      const offsetWidth = e.pageX - rect.left
+      this._offset(offsetWidth)
+      // 这里当我们点击 progressBtn 的时候，e.offsetX 获取不对
+      // this._offset(e.offsetX)
       this._tirggerPercent()
     },
     // 触发滑动圆点，停留的位置
