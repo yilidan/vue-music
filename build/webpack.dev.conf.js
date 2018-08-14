@@ -70,7 +70,7 @@ const devWebpackConfig = merge(baseWebpackConfig, {
       poll: config.dev.poll,
     },
     before(apiRoutes) {
-      // 请求qq音乐接口
+      // 请求qq音乐歌曲列表接口
       apiRoutes.get('/api/getDiscList', function (req, res) {
         var url = 'https://c.y.qq.com/splcloud/fcgi-bin/fcg_get_diss_by_tag.fcg'
         // var url = 'http://ustbhuangyi.com/music/api/getDiscList'
@@ -90,27 +90,37 @@ const devWebpackConfig = merge(baseWebpackConfig, {
             console.log(error)
           })
       })
-      // 请求qq音乐接口
-      // apiRoutes.get('/api/getPurlUrl', function (req, res) {
-      //   var url = 'https://c.y.qq.com/v8/fcg-bin/fcg_v8_singer_track_cp.fcg'
-      //   // var url = 'http://ustbhuangyi.com/music/api/getPurlUrl'
-      //   axios.get(url, {
-      //       headers: {
-      //         // referer: 'http://ustbhuangyi.com/music/',
-      //         // host: 'ustbhuangyi.com'
-      //         referer: 'https://c.y.qq.com/',
-      //         host: 'c.y.qq.com'
-      //       },
-      //       params: req.query
-      //     })
-      //     .then(function (response) {
-      //       res.json(response.data)
-      //     })
-      //     .catch(function (error) {
-      //       console.log(error)
-      //     })
-      // })
-      // app.use('/api', apiRoutes)
+
+      // 请求qq音乐歌词接口
+      apiRoutes.get('/api/lyric', function (req, res) {
+        var url = 'https://c.y.qq.com/lyric/fcgi-bin/fcg_query_lyric_new.fcg'
+        // var url = 'http://ustbhuangyi.com/music/api/getDiscList'
+        axios.get(url, {
+            headers: {
+              // referer: 'http://ustbhuangyi.com/music/',
+              // host: 'ustbhuangyi.com'
+              referer: 'https://c.y.qq.com/',
+              host: 'c.y.qq.com'
+            },
+            params: req.query
+          })
+          .then(function (response) {
+            var ret = response.data
+            if (typeof ret === 'string') {
+              // 把jsonp字符串中的‘{}’里面的数据匹配出来
+              var reg = /^\w+\(({[^()]+})\)$/
+              var matches = ret.match(reg)
+              if (matches) {
+                ret = JSON.parse(matches[1])
+              }
+            }
+            res.json(ret)
+          })
+          .catch(function (error) {
+            console.log(error)
+          })
+      })
+
     }
   },
   plugins: [

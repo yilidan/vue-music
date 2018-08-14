@@ -8,7 +8,7 @@ const debug = process.env.NODE_ENV !== 'production'
 export function getLyric(mid) {
   // const url = debug ? '/api/lyric' : 'http://ustbhuangyi.com/music/api/lyric'
 
-  const url = 'http://ustbhuangyi.com/music/api/getPurlUrl'
+  const url = '/api/lyric'
 
   const data = Object.assign({}, commonParams, {
     songmid: mid,
@@ -16,6 +16,7 @@ export function getLyric(mid) {
     hostUin: 0,
     needNewCode: 0,
     categoryId: 10000000,
+    g_tk: 5381,
     pcachetime: +new Date(),
     format: 'json'
   })

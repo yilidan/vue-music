@@ -111,6 +111,7 @@ export default {
       }
       this.$nextTick(() => {
         this.$refs.audio.play()
+        this.currentSong.getLyric()
       })
     },
     playing(newPlaying) {
@@ -370,6 +371,9 @@ export default {
           text-align center
           font-size $font-size-large
           color $color-text
+          text-overflow: ellipsis;
+          overflow: hidden;
+          white-space: nowrap;
         .subtitle
           line-height 20px
           text-align center
