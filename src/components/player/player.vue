@@ -24,6 +24,20 @@
               </div>
             </div>
           </div>
+          <!-- 歌词部分 -->
+          <scroll class="middle-r" ref="lyricList" :data="currentLyric&&currentLyric.lines">
+            <div class="lyric-wrapper">
+              <div v-if="currentLyric">
+                <p
+                  ref="lyricLine"
+                  class="text"
+                  :class="{'current': currentLineNum === index}"
+                  v-for="(line, index) in currentLyric.lines">
+                {{line.txt}}
+                </p>
+              </div>
+            </div>
+          </scroll>
         </div>
         <div class="bottom">
           <!-- 歌曲播放时间进度 -->
@@ -88,19 +102,24 @@ import ProgressBar from 'base/progress-bar/progress-bar.vue'
 import ProgressCircle from 'base/progress-circle/progress-circle'
 import { playMode } from 'common/js/config'
 import { shuffle } from 'common/js/util'
+import Lyric from 'lyric-parser'
+import Scroll from 'base/scroll/scroll'
 
 const transform = prefixStyle('transform')
 
 export default {
   components: {
     ProgressBar,
-    ProgressCircle
+    ProgressCircle,
+    Scroll
   },
   props: {},
   data() {
     return {
       songReady: false,
-      currentTime: 0
+      currentTime: 0,
+      currentLyric: null,
+      currentLineNum: 0
     }
   },
   watch: {
@@ -111,7 +130,7 @@ export default {
       }
       this.$nextTick(() => {
         this.$refs.audio.play()
-        this.currentSong.getLyric()
+        this.getLyric()
       })
     },
     playing(newPlaying) {
@@ -252,6 +271,19 @@ export default {
         return item.id === this.currentSong.id
       })
       this.setCurrentIndex(index)
+    },
+    // 格式化歌词的格式用插件 “lyric-parser”
+    getLyric() {
+      this.currentSong.getLyric().then((lyric) => {
+        this.currentLyric = new Lyric(lyric, this.handleLyric)
+        if (this.playing) {
+          this.currentLyric.play()
+        }
+        console.log(this.currentLyric)
+      })
+    },
+    handleLyric({lineNum, txt}) {
+      this.currentLineNum = lineNum
     },
     _pad(num, n=2) {
       let len = num.toString().length
@@ -419,6 +451,23 @@ export default {
                 // box-sizing border-box
                 border-radius 50%
                 // border 10px solid hsla(0,0%,100%,.1)
+        .middle-r
+          display: inline-block
+          vertical-align: top
+          width: 100%
+          height: 100%
+          overflow: hidden
+          .lyric-wrapper
+            width: 80%
+            margin: 0 auto
+            overflow: hidden
+            text-align: center
+            .text
+              line-height: 32px
+              color: $color-text-l
+              font-size: $font-size-medium
+              &.current
+                color: $color-text
       .bottom
         position absolute
         bottom 50px
