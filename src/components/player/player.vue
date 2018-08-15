@@ -16,8 +16,12 @@
           <h1 class="title" v-html="currentSong.name"></h1>
           <h2 class="subtitle" v-html="currentSong.singer"></h2>
         </div>
-        <div class="middle">
-          <div class="middle-l">
+        <div class="middle"
+            @touchstart.prevent="middleTouchStart"
+            @touchmove.prevent="middleTouchMove"
+            @touchend="middleTouchEnd">
+          <!-- cd部分 -->
+          <div class="middle-l" ref="middleL">
             <div class="cd-wrapper" ref="cdWrapper">
               <div class="cd" :class="cdCls">
                 <img class="image" :src="currentSong.image">
@@ -40,6 +44,11 @@
           </scroll>
         </div>
         <div class="bottom">
+          <!-- cd和歌词切换 -->
+          <div class="dot-wrapper">
+            <span class="dot" :class="{'active': currentShow==='cd'}"></span>
+            <span class="dot" :class="{'active': currentShow==='lyric'}"></span>
+          </div>
           <!-- 歌曲播放时间进度 -->
           <div class="progress-wrapper">
             <span class="time time-l">{{format(currentTime)}}</span>
@@ -106,6 +115,7 @@ import Lyric from 'lyric-parser'
 import Scroll from 'base/scroll/scroll'
 
 const transform = prefixStyle('transform')
+const transitionDuration = prefixStyle('transitionDuration')
 
 export default {
   components: {
@@ -119,7 +129,8 @@ export default {
       songReady: false,
       currentTime: 0,
       currentLyric: null,
-      currentLineNum: 0
+      currentLineNum: 0,
+      currentShow: 'cd'
     }
   },
   watch: {
@@ -127,6 +138,9 @@ export default {
       console.log(this.currentSong)
       if (newSong.id === oldSong.id) {
         return
+      }
+      if (this.currentLyric) {
+        this.currentLyric.stop()
       }
       this.$nextTick(() => {
         this.$refs.audio.play()
@@ -140,6 +154,9 @@ export default {
       })
     }
   },
+  created() {
+    this.touch = {}
+  },
   computed: {
     cdCls() {
       return this.playing ? 'play' : 'play pause'
@@ -149,7 +166,9 @@ export default {
     },
     // 更改播放模式icon 随机，顺序，单曲
     iconMode() {
-      return this.mode === playMode.sequence ? 'icon-sequence' : this.mode === playMode.loop ? 'icon-loop' : 'icon-random'
+      return this.mode === playMode.sequence
+        ? 'icon-sequence'
+        : this.mode === playMode.loop ? 'icon-loop' : 'icon-random'
     },
     miniIcon() {
       return this.playing ? 'icon-pause-mini' : 'icon-play-mini'
@@ -183,8 +202,11 @@ export default {
       if (!this.songReady) {
         return
       }
-      console.log(this.playing)
+      // console.log(this.playing)
       this.setPlayingState(!this.playing)
+      if(this.currentLyric) {
+        this.currentLyric.togglePlay()
+      }
     },
     // 歌曲播放完之后自动下一首
     end() {
@@ -199,6 +221,7 @@ export default {
       this.$refs.audio.currentTime = 0
       this.$refs.audio.play()
     },
+    // 下一首歌曲Btn
     next() {
       if (!this.songReady) {
         return
@@ -213,6 +236,7 @@ export default {
       }
       this.songReady = false
     },
+    // 上一首歌曲Btn
     prev() {
       if (!this.songReady) {
         return
@@ -267,14 +291,14 @@ export default {
     },
     // 当前播放歌曲的index索引
     resetCurrentIndex(list) {
-      let index = list.findIndex((item) => {
+      let index = list.findIndex(item => {
         return item.id === this.currentSong.id
       })
       this.setCurrentIndex(index)
     },
     // 格式化歌词的格式用插件 “lyric-parser”
     getLyric() {
-      this.currentSong.getLyric().then((lyric) => {
+      this.currentSong.getLyric().then(lyric => {
         this.currentLyric = new Lyric(lyric, this.handleLyric)
         if (this.playing) {
           this.currentLyric.play()
@@ -282,12 +306,80 @@ export default {
         console.log(this.currentLyric)
       })
     },
-    handleLyric({lineNum, txt}) {
+    // Lyric的回调方法
+    handleLyric({ lineNum, txt }) {
       this.currentLineNum = lineNum
+      // 歌词在中间滚动
+      if (lineNum > 5) {
+        let lineEl = this.$refs.lyricLine[lineNum - 5]
+        this.$refs.lyricList.scrollToElement(lineEl, 1000)
+      } else {
+        this.$refs.lyricList.scrollTo(0, 0, 1000)
+      }
     },
-    _pad(num, n=2) {
+    // cd 与 歌词 之间滑动切换（touch事件）
+    middleTouchStart(e) {
+      this.touch.initiated = true
+      const touch = e.touches[0]
+      this.touch.startX = touch.pageX
+      this.touch.startY = touch.pageY
+    },
+    middleTouchMove(e) {
+      if (!this.touch.initiated) {
+        return
+      }
+      const touch = e.touches[0]
+      const deltaX = touch.pageX - this.touch.startX
+      const deltaY = touch.pageY - this.touch.startY
+      if (Math.abs(deltaY) > Math.abs(deltaX)) {
+        return
+      }
+      const left = this.currentShow === 'cd' ? 0 : -window.innerWidth
+      const offsetWidth = Math.min(
+        0,
+        Math.max(-window.innerWidth, left + deltaX)
+      )
+      this.touch.percent = Math.abs(offsetWidth / window.innerWidth)
+      this.$refs.lyricList.$el.style[
+        transform
+      ] = `translate3d(${offsetWidth}px, 0, 0)`
+      this.$refs.lyricList.$el.style[transitionDuration] = 0
+      this.$refs.middleL.style.opacity = 1 - this.touch.percent
+      this.$refs.middleL.style[transitionDuration] = 0
+    },
+    middleTouchEnd() {
+      let offsetWidth
+      let opacity
+      if (this.currentShow === 'cd') {
+        if (this.touch.percent > 0.1) {
+          offsetWidth = -window.innerWidth
+          this.currentShow = 'lyric'
+          opacity = 0
+        } else {
+          offsetWidth = 0
+          opacity = 1
+        }
+      } else {
+        if (this.touch.percent < 0.9) {
+          offsetWidth = 0
+          this.currentShow = 'cd'
+          opacity = 1
+        } else {
+          offsetWidth = -window.innerWidth
+          opacity = 0
+        }
+      }
+      const time = 300
+      this.$refs.lyricList.$el.style[
+        transform
+      ] = `translate3d(${offsetWidth}px, 0, 0)`
+      this.$refs.lyricList.$el.style[transitionDuration] = `${time}ms`
+      this.$refs.middleL.style.opacity = opacity
+      this.$refs.middleL.style[transitionDuration] = `${time}ms`
+    },
+    _pad(num, n = 2) {
       let len = num.toString().length
-      while(len<n) {
+      while (len < n) {
         num = '0' + num
         len++
       }
@@ -472,6 +564,21 @@ export default {
         position absolute
         bottom 50px
         width 100%
+        .dot-wrapper
+          text-align: center
+          font-size: 0
+          .dot
+            display: inline-block
+            vertical-align: middle
+            margin: 0 4px
+            width: 8px
+            height: 8px
+            border-radius: 50%
+            background: $color-text-l
+            &.active
+              width: 20px
+              border-radius: 5px
+              background: $color-text-ll
         .progress-wrapper
           display: flex
           align-items: center
