@@ -27,6 +27,9 @@
                 <img class="image" :src="currentSong.image">
               </div>
             </div>
+            <div class="playing-lyric-wrapper">
+              <div class="playing-lyric">{{playingLyric}}</div>
+            </div>
           </div>
           <!-- 歌词部分 -->
           <scroll class="middle-r" ref="lyricList" :data="currentLyric&&currentLyric.lines">
@@ -130,7 +133,8 @@ export default {
       currentTime: 0,
       currentLyric: null,
       currentLineNum: 0,
-      currentShow: 'cd'
+      currentShow: 'cd',
+      playingLyric: ''
     }
   },
   watch: {
@@ -142,10 +146,10 @@ export default {
       if (this.currentLyric) {
         this.currentLyric.stop()
       }
-      this.$nextTick(() => {
+      setTimeout(() => {
         this.$refs.audio.play()
         this.getLyric()
-      })
+      }, 1000)
     },
     playing(newPlaying) {
       const audio = this.$refs.audio
@@ -220,19 +224,26 @@ export default {
     loop() {
       this.$refs.audio.currentTime = 0
       this.$refs.audio.play()
+      if (this.currentLyric) {
+        this.currentLyric.seek(0)
+      }
     },
     // 下一首歌曲Btn
     next() {
       if (!this.songReady) {
         return
       }
-      let index = this.currentIndex + 1
-      if (index === this.playlist.length) {
-        index = 0
-      }
-      this.setCurrentIndex(index)
-      if (!this.playing) {
-        this.togglePlaying()
+      if (this.playlist.length === 1) {
+        this.loop()
+      } else {
+        let index = this.currentIndex + 1
+        if (index === this.playlist.length) {
+          index = 0
+        }
+        this.setCurrentIndex(index)
+        if (!this.playing) {
+          this.togglePlaying()
+        }
       }
       this.songReady = false
     },
@@ -241,13 +252,17 @@ export default {
       if (!this.songReady) {
         return
       }
-      let index = this.currentIndex - 1
-      if (index === -1) {
-        index = this.playlist.length - 1
-      }
-      this.setCurrentIndex(index)
-      if (!this.playing) {
-        this.togglePlaying()
+      if (this.playlist.length === 1) {
+        this.loop()
+      } else {
+        let index = this.currentIndex - 1
+        if (index === -1) {
+          index = this.playlist.length - 1
+        }
+        this.setCurrentIndex(index)
+        if (!this.playing) {
+          this.togglePlaying()
+        }
       }
       this.songReady = false
     },
@@ -274,6 +289,9 @@ export default {
       console.log(currentTime)
       if (!this.playing) {
         this.togglePlaying()
+      }
+      if (this.currentLyric) {
+        this.currentLyric.seek(currentTime * 1000)
       }
     },
     // 播放模式更改
@@ -304,6 +322,10 @@ export default {
           this.currentLyric.play()
         }
         console.log(this.currentLyric)
+      }).catch(() => {
+        this.currentLyric = null
+        this.playingLyric = ''
+        this.currentLineNum = 0
       })
     },
     // Lyric的回调方法
@@ -316,6 +338,7 @@ export default {
       } else {
         this.$refs.lyricList.scrollTo(0, 0, 1000)
       }
+      this.playingLyric = txt
     },
     // cd 与 歌词 之间滑动切换（touch事件）
     middleTouchStart(e) {
@@ -495,9 +518,9 @@ export default {
           text-align center
           font-size $font-size-large
           color $color-text
-          text-overflow: ellipsis;
-          overflow: hidden;
-          white-space: nowrap;
+          text-overflow: ellipsis
+          overflow: hidden
+          white-space: nowrap
         .subtitle
           line-height 20px
           text-align center
@@ -543,6 +566,17 @@ export default {
                 // box-sizing border-box
                 border-radius 50%
                 // border 10px solid hsla(0,0%,100%,.1)
+
+          .playing-lyric-wrapper
+            width: 80%
+            margin: 30px auto 0 auto
+            overflow: hidden
+            text-align: center
+            .playing-lyric
+              height: 20px
+              line-height: 20px
+              font-size: $font-size-medium
+              color: $color-text-l
         .middle-r
           display: inline-block
           vertical-align: top

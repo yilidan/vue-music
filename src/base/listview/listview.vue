@@ -143,6 +143,9 @@ export default {
     scroll(pos) {
       this.scrollY = pos.y
     },
+    refresh() {
+      this.$refs.listview.refresh()
+    },
     // 点击右侧导航栏，左侧跳到相应区块
     _scrollTo(index) {
       // if ((!index && index !== 0) || index < 0) {
