@@ -43,7 +43,7 @@ import {getRecommend} from 'api/recommend.js'
 import {getDiscList} from 'api/recommend.js'
 import {ERR_OK} from 'api/config.js'
 import {playlistMixin} from 'common/js/mixin'
-// import axios from 'axios'
+import {mapMutations} from 'vuex'
 
 export default {
   mixins: [playlistMixin],
@@ -75,6 +75,7 @@ export default {
       this.$router.push({
         path: `/recommend/${item.dissid}`
       })
+      this.setDisc(item)
     },
     _getRecommend() {
       getRecommend().then((res) => {
@@ -107,7 +108,10 @@ export default {
         this.$refs.scroll.refresh()
         this.checkLoaded = true
       }
-    }
+    },
+    ...mapMutations({
+      setDisc: 'SET_DISC'
+    })
   }
 }
 </script>

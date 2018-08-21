@@ -70,7 +70,7 @@ const devWebpackConfig = merge(baseWebpackConfig, {
       poll: config.dev.poll,
     },
     before(apiRoutes) {
-      // 请求qq音乐歌曲列表接口
+      // 请求qq音乐recommend推荐页的热门歌单数据
       apiRoutes.get('/api/getDiscList', function (req, res) {
         var url = 'https://c.y.qq.com/splcloud/fcgi-bin/fcg_get_diss_by_tag.fcg'
         // var url = 'http://ustbhuangyi.com/music/api/getDiscList'
@@ -91,10 +91,38 @@ const devWebpackConfig = merge(baseWebpackConfig, {
           })
       })
 
-      // 请求qq音乐歌词接口
+      // 请求qq音乐player组件歌曲的歌词接口
       apiRoutes.get('/api/lyric', function (req, res) {
         var url = 'https://c.y.qq.com/lyric/fcgi-bin/fcg_query_lyric_new.fcg'
-        // var url = 'http://ustbhuangyi.com/music/api/getDiscList'
+        axios.get(url, {
+            headers: {
+              // referer: 'http://ustbhuangyi.com/music/',
+              // host: 'ustbhuangyi.com'
+              referer: 'https://c.y.qq.com/',
+              host: 'c.y.qq.com'
+            },
+            params: req.query
+          })
+          .then(function (response) {
+            var ret = response.data
+            if (typeof ret === 'string') {
+              // 把jsonp字符串中的‘{}’里面的数据匹配出来
+              var reg = /^\w+\(({[^()]+})\)$/
+              var matches = ret.match(reg)
+              if (matches) {
+                ret = JSON.parse(matches[1])
+              }
+            }
+            res.json(ret)
+          })
+          .catch(function (error) {
+            console.log(error)
+          })
+      })
+
+      // 抓取recommend推荐页歌单数据
+      apiRoutes.get('/api/getCdInfo', function (req, res) {
+        var url = 'https://c.y.qq.com/qzone/fcg-bin/fcg_ucc_getcdinfo_byids_cp.fcg'
         axios.get(url, {
             headers: {
               // referer: 'http://ustbhuangyi.com/music/',

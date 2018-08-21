@@ -14,7 +14,9 @@ const state = {
   // 三种歌曲播放顺序选择
   mode: playMode.sequence,
   // 当前播放歌曲
-  currentIndex: -1
+  currentIndex: -1,
+  // 推荐界面选中歌单
+  disc: {}
 }
 
 export default state
