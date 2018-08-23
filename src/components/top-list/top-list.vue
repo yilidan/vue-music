@@ -1,13 +1,13 @@
 <template>
   <transition name="slide">
-    <music-list :songs="songs" :title="title" :bg-image="bgImage"></music-list>
+    <music-list :rank="rank" :songs="songs" :title="title" :bgImage="bgImage"></music-list>
   </transition>
 </template>
 
 <script>
 import MusicList from 'components/music-list/music-list'
 import { mapGetters } from 'vuex'
-import { getSongList } from 'api/recommend'
+import { getMusicList } from 'api/rank'
 import { ERR_OK } from 'api/config'
 import {createSong} from 'common/js/song'
 
@@ -17,36 +17,41 @@ export default {
   },
   data() {
     return {
-      songs: []
+      songs: [],
+      rank: true
     }
+  },
+  created() {
+    this._getMusicList()
   },
   computed: {
     title() {
-      return this.disc.dissname
+      return this.toplist.topTitle
     },
     bgImage() {
-      return this.disc.imgurl
+      if (this.songs.length) {
+        return this.songs[0].image
+      }
+      return ''
     },
-    ...mapGetters(['disc'])
-  },
-  created() {
-    this._getSongList()
+    ...mapGetters(['toplist'])
   },
   methods: {
-    _getSongList() {
-      if (!this.disc.dissid) {
-        this.$router.push('/recommend')
+    _getMusicList() {
+      if(!this.toplist.id) {
+        this.$router.push('/rank')
         return
       }
-      getSongList(this.disc.dissid).then(res => {
+      getMusicList(this.toplist.id).then(res => {
         if (res.code === ERR_OK) {
-          this.songs = this._normalizeSongs(res.cdlist[0].songlist)
+          this.songs = this._normalizeSongs(res.songlist)
         }
       })
     },
     _normalizeSongs(list) {
       let ret = []
-      list.forEach((musicData) => {
+      list.forEach(item => {
+        const musicData = item.data
         if (musicData.songid && musicData.albumid) {
           ret.push(createSong(musicData))
         }
@@ -58,10 +63,8 @@ export default {
 </script>
 
 <style lang="stylus" scoped>
-
   .slide-enter-active,.slide-leave-active
     transition all 0.3s
-
   .slide-enter,.slide-leave-to
     transform translate3d(100%, 0, 0)
 </style>

@@ -149,6 +149,33 @@ const devWebpackConfig = merge(baseWebpackConfig, {
           })
       })
 
+      // 抓取搜索页面搜索时列表的数据
+      apiRoutes.get('/api/search', function (req, res) {
+        var url = 'https://c.y.qq.com/soso/fcgi-bin/search_for_qq_cp'
+        axios.get(url, {
+            headers: {
+              referer: 'https://c.y.qq.com/',
+              host: 'c.y.qq.com'
+            },
+            params: req.query
+          })
+          .then(function (response) {
+            var ret = response.data
+            if (typeof ret === 'string') {
+              // 把jsonp字符串中的‘{}’里面的数据匹配出来
+              var reg = /^\w+\(({[^()]+})\)$/
+              var matches = ret.match(reg)
+              if (matches) {
+                ret = JSON.parse(matches[1])
+              }
+            }
+            res.json(ret)
+          })
+          .catch(function (error) {
+            console.log(error)
+          })
+      })
+
     }
   },
   plugins: [
