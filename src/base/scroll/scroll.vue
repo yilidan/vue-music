@@ -17,11 +17,17 @@ export default {
       type: Boolean,
       default: true
     },
+    // 列表数据
     data: {
       type: Array,
       default: null
     },
     listenScroll: {
+      type: Boolean,
+      default: false
+    },
+    // 上拉刷新
+    pullup: {
       type: Boolean,
       default: false
     }
@@ -46,8 +52,16 @@ export default {
       // 是否监听滚动，触发父组件scroll事件
       if (this.listenScroll) {
         let me = this
-        this.scroll.on('scroll', (pos) => {
+        this.scroll.on('scroll', pos => {
           me.$emit('scroll', pos)
+        })
+      }
+      // 上拉加载
+      if (this.pullup) {
+        this.scroll.on('scrollEnd', () => {
+          if (this.scroll.y <= (this.scroll.maxScrollY + 50)) {
+            this.$emit('scrollToEnd')
+          }
         })
       }
     },

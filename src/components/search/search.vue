@@ -42,12 +42,16 @@ export default {
     this._getHotKey()
   },
   methods: {
+    // 点击热门搜索的内容，并显示在搜索框内
     addQuery(query) {
+      // 用$refs去触发子组件中的事件
       this.$refs.searchBox.setQuery(query)
     },
+    // 输入需要搜索的内容 调接口取数据
     onQueryChange(query) {
       this.query = query
     },
+    // 获取热门搜索列表内容
     _getHotKey() {
       getHotKey().then(res => {
         if (res.code === ERR_OK) {

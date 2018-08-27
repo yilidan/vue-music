@@ -13,13 +13,14 @@ export function getHotKey() {
   return jsonp(url, data, opts)
 }
 
-export function search(query, page, zhida) {
+export function search(query, page, zhida, perpage) {
   const url = '/api/search'
 
   const data = Object.assign({}, commonParams, {
     w: query,
     p: page,
-    n: 20,
+    perpage,
+    n: perpage,
     catZhida: zhida ? 1 : 0,
     zhidaqu: 1,
     t: 0,

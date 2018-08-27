@@ -20,11 +20,13 @@ export default {
     }
   },
   created () {
+    // 给父元素传递搜索内容
     this.$watch('query', (newQuery) => {
       this.$emit('query', newQuery)
     })
   },
   methods: {
+    // 清空搜索条内容
     clear() {
       this.query = ''
     },
