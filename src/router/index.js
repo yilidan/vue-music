@@ -17,6 +17,7 @@ export default new Router({
       path: '/',
       redirect: '/recommend'
     },
+    // 推荐页面
     {
       path: '/recommend',
       component: Recommend,
@@ -27,6 +28,7 @@ export default new Router({
         }
       ]
     },
+    // 歌手页面
     {
       path: '/singer',
       component: Singer,
@@ -37,6 +39,7 @@ export default new Router({
         }
       ]
     },
+    // 排行榜页面
     {
       path: '/rank',
       component: Rank,
@@ -47,9 +50,16 @@ export default new Router({
         }
       ]
     },
+    // 搜索页面
     {
       path: '/search',
-      component: Search
+      component: Search,
+      children: [
+        {
+          path: ':id',
+          component: SingerDetail
+        }
+      ]
     }
   ]
 })
