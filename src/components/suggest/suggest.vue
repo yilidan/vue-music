@@ -4,6 +4,8 @@
     class="suggest"
     :pullup="pullup"
     @scrollToEnd="searchMore"
+    :beforeScroll="beforeScroll"
+    @beforeScroll="listScroll"
     ref="suggest">
     <ul class="suggest-list">
       <li @click="selectItem(item)" class="suggest-item" v-for="item in result">
@@ -57,7 +59,8 @@ export default {
       result: [],
       // 上拉加载
       pullup: true,
-      hasMore: true
+      hasMore: true,
+      beforeScroll: true
     }
   },
   watch: {
@@ -72,6 +75,9 @@ export default {
     }, 20)
   },
   methods: {
+    listScroll() {
+      this.$emit('listScroll')
+    },
     // 跳转 router
     selectItem(item) {
       if (item.type === TYPE_SINGER) {
@@ -86,6 +92,7 @@ export default {
       } else {
         this.insertSong(item)
       }
+      this.$emit('select')
     },
     // 显示歌曲icon或歌手icon
     getIconCls(item) {
