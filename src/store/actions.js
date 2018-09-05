@@ -2,7 +2,7 @@ import * as types from './mutation-types'
 import {playMode} from 'common/js/config'
 import {shuffle} from 'common/js/util'
 // 存储搜索的内容
-import {saveSearch} from 'common/js/cache'
+import {saveSearch, deleteSearch, clearSearch} from 'common/js/cache'
 
 function findIndex(list, song) {
   return list.findIndex((item) => {
@@ -81,4 +81,12 @@ export const insertSong = function({commit, state}, song) {
 // 存储搜索历史
 export const saveSearchHistory = function({commit}, query) {
   commit(types.SET_SEARCH_HISTORY, saveSearch(query))
+}
+// 删除单个搜索历史
+export const deleteSearchHistory = function({commit}, query) {
+  commit(types.SET_SEARCH_HISTORY, deleteSearch(query))
+}
+// 清空搜索历史内容
+export const clearSearchHistory = function({commit}) {
+  commit(types.SET_SEARCH_HISTORY, clearSearch())
 }
