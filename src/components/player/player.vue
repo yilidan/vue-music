@@ -95,12 +95,13 @@
             <i @click.stop="togglePlaying" class="icon-mini" :class="miniIcon"></i>
           </progress-circle>
         </div>
-        <div class="control">
+        <div class="control" @click.stop="showPlaylist">
           <i class="icon-playlist"></i>
         </div>
       </div>
     </transition>
-    <audio ref="audio" :src="currentSong.url" @canplay="ready" @error="error" @timeupdate="updateTime" @ended="end"></audio>
+    <playlist ref="playlist"></playlist>
+    <audio id="audio" ref="audio" :src="currentSong.url" @play="ready" @error="error" @timeupdate="updateTime" @ended="end"></audio>
   </div>
 </template>
 
@@ -116,6 +117,10 @@ import { playMode } from 'common/js/config'
 import { shuffle } from 'common/js/util'
 import Lyric from 'lyric-parser'
 import Scroll from 'base/scroll/scroll'
+import Playlist from 'components/playlist/playlist'
+
+// import VConsole from 'vconsole'
+// const vConsole = new VConsole()
 
 const transform = prefixStyle('transform')
 const transitionDuration = prefixStyle('transitionDuration')
@@ -124,7 +129,8 @@ export default {
   components: {
     ProgressBar,
     ProgressCircle,
-    Scroll
+    Scroll,
+    Playlist
   },
   props: {},
   data() {
@@ -140,6 +146,9 @@ export default {
   watch: {
     currentSong(newSong, oldSong) {
       console.log(this.currentSong)
+      if (!newSong.id) {
+        return
+      }
       if (newSong.id === oldSong.id) {
         return
       }
@@ -148,6 +157,11 @@ export default {
       }
       setTimeout(() => {
         this.$refs.audio.play()
+        // var bgAudio = document.getElementById('audio')
+        // document.addEventListener("WeixinJSBridgeReady", function() {
+        //   bgAudio.load()
+        //   bgAudio.play()
+        // }, false)
         this.getLyric()
       }, 1000)
     },
@@ -339,6 +353,10 @@ export default {
         this.$refs.lyricList.scrollTo(0, 0, 1000)
       }
       this.playingLyric = txt
+    },
+    // 歌单弹窗展示
+    showPlaylist() {
+      this.$refs.playlist.show()
     },
     // cd 与 歌词 之间滑动切换（touch事件）
     middleTouchStart(e) {
