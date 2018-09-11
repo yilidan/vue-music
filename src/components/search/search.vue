@@ -39,14 +39,14 @@ import SearchBox from 'base/search-box/search-box'
 import { getHotKey } from 'api/search'
 import { ERR_OK } from 'api/config'
 import Suggest from 'components/suggest/suggest'
-import { mapActions, mapGetters } from 'vuex'
+import { mapActions } from 'vuex'
 import SearchList from 'base/search-list/search-list'
 import Confirm from 'base/confirm/confirm'
 import Scroll from 'base/scroll/scroll'
-import { playlistMixin } from 'common/js/mixin'
+import { playlistMixin, searchMixin } from 'common/js/mixin'
 
 export default {
-  mixins: [playlistMixin],
+  mixins: [playlistMixin, searchMixin],
   components: {
     SearchBox,
     Suggest,
@@ -56,8 +56,8 @@ export default {
   },
   data() {
     return {
-      hotKey: [],
-      query: ''
+      hotKey: []
+      // query: ''
     }
   },
   watch: {
@@ -76,7 +76,9 @@ export default {
     shortcut() {
       return this.hotKey.concat(this.searchHistory)
     },
-    ...mapGetters(['searchHistory'])
+    // ...mapGetters([
+    //   'searchHistory'
+    // ])
   },
   methods: {
     handlePlaylist(playlist) {
@@ -88,19 +90,19 @@ export default {
       this.$refs.searchResult.style.bottom = bottom
       this.$refs.suggest.refresh()
     },
-    // 保存搜索历史
-    saveSearch() {
-      this.saveSearchHistory(this.query)
-    },
-    // 使input框失去焦点
-    blurInput() {
-      this.$refs.searchBox.blur()
-    },
-    // 点击热门搜索的内容，并显示在搜索框内
-    addQuery(query) {
-      // 用$refs去触发子组件中的事件
-      this.$refs.searchBox.setQuery(query)
-    },
+    // // 保存搜索历史
+    // saveSearch() {
+    //   this.saveSearchHistory(this.query)
+    // },
+    // // 使input框失去焦点
+    // blurInput() {
+    //   this.$refs.searchBox.blur()
+    // },
+    // // 点击热门搜索的内容，并显示在搜索框内
+    // addQuery(query) {
+    //   // 用$refs去触发子组件中的事件
+    //   this.$refs.searchBox.setQuery(query)
+    // },
     // 删除单个搜索历史内容
     deleteOne(item) {
       this.deleteSearchHistory(item)
@@ -109,10 +111,10 @@ export default {
     showConfirm() {
       this.$refs.confirm.show()
     },
-    // 输入需要搜索的内容 调接口取数据
-    onQueryChange(query) {
-      this.query = query
-    },
+    // // 输入需要搜索的内容 调接口取数据
+    // onQueryChange(query) {
+    //   this.query = query
+    // },
     // 获取热门搜索列表内容
     _getHotKey() {
       getHotKey().then(res => {
@@ -122,8 +124,8 @@ export default {
       })
     },
     ...mapActions([
-      'saveSearchHistory',
-      'deleteSearchHistory',
+      // 'saveSearchHistory',
+      // 'deleteSearchHistory',
       'clearSearchHistory'
     ])
   }
