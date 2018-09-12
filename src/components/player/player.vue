@@ -107,7 +107,7 @@
 
 <script>
 // vuex提供的语法糖
-import { mapGetters, mapMutations } from 'vuex'
+import { mapGetters, mapMutations, mapActions } from 'vuex'
 import animations from 'create-keyframe-animation'
 // 给CSS3属性添加前缀
 import { prefixStyle } from 'common/js/dom'
@@ -283,6 +283,7 @@ export default {
     },
     ready() {
       this.songReady = true
+      this.savePlayHistory(this.currentSong)
     },
     error() {
       this.songReady = true
@@ -491,7 +492,10 @@ export default {
       setCurrentIndex: 'SET_CURRENT_INDEX'
       // setPlayMode: 'SET_PLAY_MODE',
       // setPlayList: 'SET_PLAYLIST'
-    })
+    }),
+    ...mapActions([
+      'savePlayHistory'
+    ])
   }
 }
 </script>

@@ -11,6 +11,14 @@
         <search-box ref="searchBox" @query="onQueryChange" placeholder="搜索歌曲"></search-box>
       </div>
       <div class="shortcut" v-show="!query">
+        <switches :switches="switches" :currentIndex="currentIndex" @switch="switchItem"></switches>
+        <div class="list-wrapper">
+          <scroll class="list-scroll" v-if="currentIndex === 0" :data="playHistory">
+            <div class="list-inner">
+              <song-list :songs="playHistory"></song-list>
+            </div>
+          </scroll>
+        </div>
       </div>
       <div class="search-result" v-show="query">
         <suggest :query="query" :showSinger="showSinger" @select="selectSuggest" @listScroll="blurInput"></suggest>
@@ -23,18 +31,35 @@
 import SearchBox from 'base/search-box/search-box'
 import Suggest from 'components/suggest/suggest'
 import {searchMixin} from 'common/js/mixin'
+import Switches from 'base/switches/switches'
+import Scroll from 'base/scroll/scroll'
+import {mapGetters} from 'vuex'
+import SongList from 'base/song-list/song-list'
 
 export default {
   mixins: [searchMixin],
   components: {
     SearchBox,
-    Suggest
+    Suggest,
+    Switches,
+    Scroll,
+    SongList
   },
   data () {
     return {
       showFlag: false,
-      showSinger: false
+      showSinger: false,
+      currentIndex: 0,
+      switches: [
+        {name: '最近播放'},
+        {name: '搜索历史'}
+      ]
     }
+  },
+  computed: {
+    ...mapGetters([
+      'playHistory'
+    ])
   },
   methods: {
     show() {
@@ -45,6 +70,9 @@ export default {
     },
     selectSuggest() {
       this.saveSearch()
+    },
+    switchItem(index) {
+      this.currentIndex = index
     }
   }
 }

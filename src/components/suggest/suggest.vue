@@ -59,6 +59,7 @@ export default {
       result: [],
       // 上拉加载
       pullup: true,
+      // loading
       hasMore: true,
       beforeScroll: true
     }
@@ -126,6 +127,7 @@ export default {
         }
       })
     },
+    // 上拉加载
     searchMore() {
       if (!this.hasMore) {
         return
