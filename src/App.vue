@@ -20,6 +20,30 @@ export default {
     MHeader,
     Tab,
     Player
+  },
+  data () {
+    return {
+      stop: false
+    }
+  },
+  watch: {
+    stop () {
+      let m = document.querySelector('#app')
+      m.removeEventListener('touchend', this.firstPlay)
+    }
+  },
+  mounted () {
+    let m = document.querySelector('#app')
+    m.addEventListener('touchend', this.firstPlay)
+  },
+  methods: {
+    firstPlay () {
+      let music = document.querySelector('#music-audio')
+      music.play()
+      if (music.src !== '') {
+        this.stop = true
+      }
+    }
   }
 }
 </script>

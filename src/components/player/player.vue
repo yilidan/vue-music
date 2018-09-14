@@ -101,7 +101,7 @@
       </div>
     </transition>
     <playlist ref="playlist"></playlist>
-    <audio id="audio" ref="audio" :src="currentSong.url" @play="ready" @error="error" @timeupdate="updateTime" @ended="end"></audio>
+    <audio id="music-audio" ref="audio" :src="currentSong.url" @playing="ready" @error="error" @timeupdate="updateTime" @ended="end"></audio>
   </div>
 </template>
 
@@ -147,16 +147,14 @@ export default {
   watch: {
     currentSong(newSong, oldSong) {
       console.log(this.currentSong)
-      if (!newSong.id) {
-        return
-      }
-      if (newSong.id === oldSong.id) {
+      if (!newSong.id || !newSong.url || newSong.id === oldSong.id) {
         return
       }
       if (this.currentLyric) {
         this.currentLyric.stop()
       }
       setTimeout(() => {
+        // this.$refs.audio.src = newSong.url
         this.$refs.audio.play()
         // var bgAudio = document.getElementById('audio')
         // document.addEventListener("WeixinJSBridgeReady", function() {
@@ -229,6 +227,7 @@ export default {
     },
     // 歌曲播放完之后自动下一首
     end() {
+      this.currentTime = 0
       if (this.mode === playMode.loop) {
         this.loop()
       } else {
@@ -239,6 +238,7 @@ export default {
     loop() {
       this.$refs.audio.currentTime = 0
       this.$refs.audio.play()
+      this.setPlayingState(true)
       if (this.currentLyric) {
         this.currentLyric.seek(0)
       }
@@ -283,6 +283,7 @@ export default {
     },
     ready() {
       this.songReady = true
+      console.log('---' + this.currentSong)
       this.savePlayHistory(this.currentSong)
     },
     error() {
