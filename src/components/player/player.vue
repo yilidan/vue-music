@@ -152,6 +152,10 @@ export default {
       }
       if (this.currentLyric) {
         this.currentLyric.stop()
+        this.currentLyric = null
+        this.currentTime = 0
+        this.playingLyric = ''
+        this.currentLineNum = 0
       }
       setTimeout(() => {
         // this.$refs.audio.src = newSong.url
