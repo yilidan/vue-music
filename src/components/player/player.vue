@@ -146,7 +146,7 @@ export default {
   },
   watch: {
     currentSong(newSong, oldSong) {
-      console.log(this.currentSong)
+      // console.log(this.currentSong)
       if (!newSong.id || !newSong.url || newSong.id === oldSong.id) {
         return
       }
@@ -157,7 +157,8 @@ export default {
         this.playingLyric = ''
         this.currentLineNum = 0
       }
-      setTimeout(() => {
+      clearTimeout(this.timer)
+      this.timer = setTimeout(() => {
         // this.$refs.audio.src = newSong.url
         this.$refs.audio.play()
         // var bgAudio = document.getElementById('audio')
@@ -254,6 +255,7 @@ export default {
       }
       if (this.playlist.length === 1) {
         this.loop()
+        return
       } else {
         let index = this.currentIndex + 1
         if (index === this.playlist.length) {
@@ -273,6 +275,7 @@ export default {
       }
       if (this.playlist.length === 1) {
         this.loop()
+        return
       } else {
         let index = this.currentIndex - 1
         if (index === -1) {
@@ -338,6 +341,9 @@ export default {
     // 格式化歌词的格式用插件 “lyric-parser”
     getLyric() {
       this.currentSong.getLyric().then(lyric => {
+        if (this.currentSong.lyric !== lyric) {
+          return
+        }
         this.currentLyric = new Lyric(lyric, this.handleLyric)
         if (this.playing) {
           this.currentLyric.play()
@@ -667,6 +673,8 @@ export default {
           .icon
             flex 1
             color $color-theme
+            &.disable
+              color: $color-theme-d
             i
               font-size 30px
           .i-left

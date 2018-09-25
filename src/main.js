@@ -10,6 +10,10 @@ import VueLazyload from 'vue-lazyload'
 
 import 'common/stylus/index.styl'
 
+// 防止eslint报错
+/* eslint-disable no-unused-vars */
+// import vConsole from 'vconsole'
+
 fastclick.attach(document.body)
 
 Vue.config.productionTip = false
