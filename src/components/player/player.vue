@@ -1,10 +1,10 @@
 <template>
   <div class="player" v-show="playlist.length>0">
     <transition name="normal"
-                @enter="enter"
-                @after-enter="afterEnter"
-                @leave="leave"
-                @after-leave="afterLeave">
+      @enter="enter"
+      @after-enter="afterEnter"
+      @leave="leave"
+      @after-leave="afterLeave">
       <div class="normal-player" v-show="fullScreen">
         <div class="background">
           <img :src="currentSong.image" width="100%" height="100%">
@@ -17,9 +17,9 @@
           <h2 class="subtitle" v-html="currentSong.singer"></h2>
         </div>
         <div class="middle"
-            @touchstart.prevent="middleTouchStart"
-            @touchmove.prevent="middleTouchMove"
-            @touchend="middleTouchEnd">
+          @touchstart.prevent="middleTouchStart"
+          @touchmove.prevent="middleTouchMove"
+          @touchend="middleTouchEnd">
           <!-- cd部分 -->
           <div class="middle-l" ref="middleL">
             <div class="cd-wrapper" ref="cdWrapper">
@@ -39,7 +39,7 @@
                   ref="lyricLine"
                   class="text"
                   :class="{'current': currentLineNum === index}"
-                  v-for="(line, index) in currentLyric.lines">
+                  v-for="(line, index) in currentLyric.lines" :key="index">
                 {{line.txt}}
                 </p>
               </div>

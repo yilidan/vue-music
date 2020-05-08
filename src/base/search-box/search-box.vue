@@ -7,6 +7,7 @@
 </template>
 
 <script>
+// 节流函数
 import {debounce} from 'common/js/util'
 
 export default {
@@ -23,6 +24,7 @@ export default {
   },
   created () {
     // 给父元素传递搜索内容
+    // debounce节流函数
     this.$watch('query', debounce((newQuery) => {
       this.$emit('query', newQuery)
     }, 200))
